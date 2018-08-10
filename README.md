@@ -1,4 +1,4 @@
-# mosquitto-uloop
+# magent
 
 
 
@@ -8,5 +8,4 @@
 
 
 cd package/leedarson
-git clone https://github.com/nicklgw/mosquitto-uloop.git mosquitto-uloop
-
+git clone https://github.com/nicklgw/magent.git magent
