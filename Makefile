@@ -21,7 +21,7 @@ define Package/magent
 	SECTION:=leedarson
 	CATEGORY:=Leedarson
 	TITLE:=Drive mosquitto with uloop event
-	DEPENDS:=+libjson-c +libubox +libubus +libblobmsg-json
+	DEPENDS:=+libopenssl +libjson-c +libsqlite3 +libubox +libubus +libblobmsg-json +libmosquitto +libuuid +libustream-openssl +libuci
 endef
 
 define Package/magent/description
