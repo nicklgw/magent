@@ -1,0 +1,117 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2008 OpenWrt.org
+
+USE_PROCD=1
+START=99
+STOP=14
+
+
+PROG=`which magent`
+
+VERSION_NAME="magent"
+
+CONF="/etc/magent/magent.conf"
+
+CERT_FILE="/etc/magent/cert.pem"
+
+KEY_FILE="/etc/magent/privkey.pem"
+
+DEVICE_TOKEN="/media/device.token"
+
+IFNAME="eth0"
+
+add_parm() 
+{
+	local name=$2
+	local config=$1
+	config_get parm $config $name
+	echo "${name} $parm" >> $CONF
+}
+
+parseconfig() 
+{
+	local config=$1
+	
+	add_parm ${config} did
+	add_parm ${config} sn
+	add_parm ${config} passwd
+	add_parm ${config} mac
+	add_parm ${config} model
+	add_parm ${config} mqtt_host
+	add_parm ${config} mqtt_port
+	add_parm ${config} cafile
+	add_parm ${config} certfile
+	add_parm ${config} keyfile
+	add_parm ${config} token
+	add_parm ${config} fw_ver
+	add_parm ${config} hw_ver
+	add_parm ${config} name
+	add_parm ${config} enauth
+}
+
+bootstrap() 
+{
+	did=`fw_printenv DeviceUuid | cut -d '=' -f 2`
+	uci set ${VERSION_NAME}.@${VERSION_NAME}[-1].did=$did
+	
+	passwd=`fw_printenv DeviceChiper | cut -d '=' -f 2`
+	uci set ${VERSION_NAME}.@${VERSION_NAME}[-1].passwd=$passwd
+	
+	sn=`fw_printenv DeviceSn | cut -d '=' -f 2`
+	uci set ${VERSION_NAME}.@${VERSION_NAME}[-1].sn=$sn
+	
+	mac=`mtd get_mac ${IFNAME}`
+	uci set ${VERSION_NAME}.@${VERSION_NAME}[-1].mac=$mac
+	
+	if [ ! -f $DEVICE_TOKEN ]; then
+		token=`cat /proc/sys/kernel/random/uuid | cut -d '-' -f 1`
+		echo $token > $DEVICE_TOKEN
+	else
+		token=`cat $DEVICE_TOKEN`
+		if [ x$token == x ] ;then
+			token=`cat /proc/sys/kernel/random/uuid | cut -d '-' -f 1`
+			echo $token > $DEVICE_TOKEN
+		fi
+	fi
+	
+	uci set ${VERSION_NAME}.@${VERSION_NAME}[-1].token=$token
+	
+	fw_ver=`cat /etc/openwrt_version | cut -d '-' -f 11 | tr -d -c '0-9.'`
+	uci set ${VERSION_NAME}.@${VERSION_NAME}[-1].fw_ver=$fw_ver
+	
+	uci commit
+	
+	cert read 0 $KEY_FILE
+	cert read 1 $CERT_FILE
+}
+
+boot() 
+{
+	bootstrap
+	
+	start "$@"
+}
+
+start_service()
+{
+	[ -f $CONF ] && rm -f $CONF
+	config_load ${VERSION_NAME}                      
+	config_foreach parseconfig ${VERSION_NAME}   
+	
+	procd_open_instance
+	procd_set_param command "$PROG" -c $CONF
+	procd_set_param respawn 3600 5 5
+	procd_close_instance
+}
+
+service_triggers()
+{
+	procd_add_reload_trigger "eagent"
+}
+
+reload_service()
+{
+	stop
+	start
+}
+

@@ -36,18 +36,18 @@ query_time(struct ubus_context *ctx, struct ubus_object *obj,
 	return ubus_send_reply(ctx, req, b.head);
 }
 
-static const struct ubus_method mosquitto_uloop_methods[] = {
+static const struct ubus_method magent_methods[] = {
 	UBUS_METHOD_NOARG("query_time", query_time),
 };
 
-static struct ubus_object_type mosquitto_uloop_object_type =
-	UBUS_OBJECT_TYPE("mosquitto-uloop", mosquitto_uloop_methods);
+static struct ubus_object_type magent_object_type =
+	UBUS_OBJECT_TYPE("magent", magent_methods);
 
-static struct ubus_object mosquitto_uloop_object = {
-	.name = "mosquitto-uloop",
-	.type = &mosquitto_uloop_object_type,
-	.methods = mosquitto_uloop_methods,
-	.n_methods = ARRAY_SIZE(mosquitto_uloop_methods),
+static struct ubus_object magent_object = {
+	.name = "magent",
+	.type = &magent_object_type,
+	.methods = magent_methods,
+	.n_methods = ARRAY_SIZE(magent_methods),
 };
 
 static void
@@ -55,7 +55,7 @@ ubus_connect_handler(struct ubus_context *ctx)
 {
 	int ret;
 	
-	ret = ubus_add_object(ctx, &mosquitto_uloop_object);
+	ret = ubus_add_object(ctx, &magent_object);
 	if (ret)
 		ULOG_ERR("Failed to add object: %s\n", ubus_strerror(ret));	
 	

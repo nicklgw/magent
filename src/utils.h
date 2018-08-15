@@ -4,6 +4,7 @@
 
 char *get_timestamp(char *timestamp);
 
+char *get_random(char *rand);
 
 #endif // __UTILS_H__
 

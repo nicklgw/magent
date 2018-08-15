@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define DEVICE_SUB_TOPIC	"iot/v1/c/%s/#"
+
 struct mosq_config {
 	char *id;
 	int protocol_version;

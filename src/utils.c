@@ -36,3 +36,28 @@ char *get_timestamp(char *timestamp)
 	return outstr;
 }
 
+char *get_random(char *rand)
+{
+	static char uuid_str[33];
+	
+	char tmp[3] = { 0 };
+	int i = 0;
+	unsigned char *ptr;
+	uuid_t buf;
+	
+	uuid_generate(buf);
+	
+	memset(uuid_str, 0, sizeof(uuid_str));
+	ptr = (unsigned char *)buf;
+	for(i = 0; i < 16; i++)
+	{
+		sprintf(tmp, "%2.2x", ptr[i]);
+		strcat(uuid_str, tmp);
+	}
+	
+	if(rand)
+		memcpy(rand, uuid_str, 10); 
+	
+	return uuid_str;
+}
+

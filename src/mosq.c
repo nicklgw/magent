@@ -10,6 +10,7 @@
 #include <mosquitto.h>
 
 #include "mosq.h"
+#include "utils.h"
 #include "application.h"
 
 //static struct mosq_config cfg;
@@ -32,6 +33,30 @@ void init_config(struct mosq_config *cfg)
 	cfg->host = strdup(get_app()->mqtt_host);
 	cfg->port = get_app()->mqtt_port;
 	cfg->id = strdup(get_app()->did);
+	
+	cfg->username = strdup(get_app()->did);
+	cfg->password = strdup(get_app()->passwd);
+	cfg->cafile = strdup(get_app()->cafile);
+	cfg->certfile = strdup(get_app()->certfile);
+	cfg->keyfile = strdup(get_app()->keyfile);
+	
+	char *topic = NULL;
+	asprintf(&topic, DEVICE_SUB_TOPIC, get_app()->did);
+	
+	cfg->topic_count++;
+	cfg->topics = realloc(cfg->topics, cfg->topic_count*sizeof(char *));
+	cfg->topics[cfg->topic_count-1] = strdup(topic);
+	
+	char *will_topic = NULL;
+	char *will_payload = NULL;
+	int   will_payloadlen = 0;
+	
+	asprintf(&will_topic, "iot/v1/cb/%s/device/disconnect", get_app()->did);
+	will_payloadlen = asprintf(&will_payload,
+		"{\"service\":\"device\",\"method\":\"disconnect\",\"seq\":\"%s\",\"srcAddr\":\"1.%s\",\"payload\":{}}",
+		get_random(NULL), get_app()->did);
+	
+	
 	
 }
 
