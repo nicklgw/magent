@@ -5,6 +5,7 @@
 
 #include "ubus.h"
 #include "utils.h"
+#include "application.h"
 
 static void
 signal_shutdown(int signal)
@@ -28,6 +29,9 @@ int main(int argc, char *argv[])
 {
 	int ret = 0;
 	(void)ret;
+	
+	app_test_init();
+	magent_conf_dump();
 	
 	uloop_init();
 	

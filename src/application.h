@@ -35,6 +35,8 @@ struct application {
 
 struct application* get_app(void);
 
+void app_test_init(void);
+void magent_conf_dump(void);
 
 #endif // __APPLICATION_H__
 
