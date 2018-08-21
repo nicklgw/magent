@@ -36,7 +36,15 @@ endef
 
 define Package/magent/install
 	$(INSTALL_DIR) $(1)/usr/bin
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/mosquitto-uloop $(1)/usr/bin/
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/magent $(1)/usr/bin/
+	$(INSTALL_DIR) $(1)/etc/init.d
+	$(INSTALL_BIN) ./files/magent.init $(1)/etc/init.d/magent
+	$(INSTALL_DIR) $(1)/etc/config
+	$(INSTALL_CONF) ./files/magent.config $(1)/etc/config/magent
+	$(INSTALL_DIR) $(1)/etc/magent
+	$(INSTALL_CONF) ./files/rootCA.crt $(1)/etc/magent/
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/iface
+	$(INSTALL_DATA) ./files/magent.hotplug $(1)/etc/hotplug.d/iface/26-magent	
 endef
 
 $(eval $(call BuildPackage,magent))

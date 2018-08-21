@@ -242,10 +242,18 @@ static void client_cb(struct uloop_fd *sock, unsigned int events)
 
 static void mqtt_tick_cb(struct uloop_timeout *timeout)
 {
-	if(mosquitto_socket(mcl.mosq) < 0)
+	if(!mcl.mosq) // mcl.mosq == NULL， 重新初始化
+	{
+		
+	}
+	else if(mosquitto_socket(mcl.mosq) < 0) // mcl.mosq->sock无效, 重连
+	{
 		mosquitto_reconnect(mcl.mosq);
-	
-	mosquitto_loop_misc(mcl.mosq);
+	}
+	else // 正常连接
+	{
+		mosquitto_loop_misc(mcl.mosq);
+	}
 	
 	uloop_timeout_set(timeout, MQTT_TICK_PERIOD);
 }
