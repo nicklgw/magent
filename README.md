@@ -11,4 +11,7 @@ $ cd package/leedarson
 $ git clone https://github.com/nicklgw/magent.git magent
 ```
 
+参考 ubusd client_cb
+ubusd.c 
+	-> static void client_cb(struct uloop_fd *sock, unsigned int events)
 

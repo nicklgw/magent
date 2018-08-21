@@ -3,9 +3,11 @@
 #include <libubox/uloop.h>
 #include <libubox/ulog.h>
 
+#include "application.h"
 #include "ubus.h"
 #include "utils.h"
-#include "application.h"
+#include "mosq.h"
+
 
 static void
 signal_shutdown(int signal)
@@ -41,9 +43,23 @@ int main(int argc, char *argv[])
 	
 	ubus_startup();
 	
+	ret = mqtt_init();
+	if(0 != ret)
+		return -1;
+	
+	ret = mqtt_connect();
+	if(0 != ret)
+		return -1;
+	
+	ret = mqtt_add_uloop();
+	if(0 != ret)
+		return -1;
+	
 	uloop_timeout_set(&heartbeat_timer, HEARTBEAT_PERIOD);
 	uloop_run();
 	uloop_done();
+	
+	mqtt_cleanup();
 	
 	return 0;
 }

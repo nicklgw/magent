@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <libubox/uloop.h>
 
 #define DEVICE_SUB_TOPIC	"iot/v1/c/%s/#"
 
@@ -38,10 +39,21 @@ struct mosq_config {
 	int msg_count; /* sub */
 };
 
-void init_config(struct mosq_config *cfg);
-void client_config_cleanup(struct mosq_config *cfg);
-int client_opts_set(struct mosquitto *mosq, struct mosq_config *cfg);
+struct mqtt_client {
+	struct mosquitto *mosq;
+	struct uloop_fd sock;
+	
+};
 
+int mqtt_init(void);
+
+int mqtt_connect(void);
+
+int mqtt_add_uloop(void);
+
+void mqtt_cleanup(void);
+
+int mqtt_publish(const char *topic, int payloadlen, const void *payload);
 
 #endif // __MOSQ_H__
 
